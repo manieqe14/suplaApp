@@ -1,0 +1,1 @@
+insert into supla_devices values(1, 'Volumio', '192.168.1.1', false);

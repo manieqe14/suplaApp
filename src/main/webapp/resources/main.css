@@ -1,0 +1,95 @@
+@charset "UTF-8";
+
+body{
+	font-family: 'Lato', sans-serif;
+}
+
+div{
+	font-size: 1em;
+}
+
+h1, h2, h3, h4, h5{
+	text-align: center;
+}
+
+#main-container{
+	width: 100%;
+	min-width: 600px;
+	transition: opacity 0.3s; 
+}
+
+#second-container{
+	margin: auto;
+}
+
+#info-view{
+	display: none;
+	position: fixed;
+	max-width: 80%;
+	background: white;
+	left: 50%;
+	transform: translateX(-50%);
+	top: 20%;
+	transition: display 0.3s;
+}
+
+#info-view-content{
+	padding: 10px;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	-webkit-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
+	-moz-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
+	box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
+	
+}
+
+table{
+	margin: auto;
+}
+
+.container{
+	text-align:center;
+	margin: auto;
+}
+
+form{
+	margin: 10px;
+}
+
+.input-field input[type="text"] + label{
+	position: absolute;
+	left: 5px;
+	font-size: 0.8em;
+	top: 10%;
+	transition: all 0.3s;
+}
+
+.input-field input[type="text"]:focus ~ label{
+	left: 0px;
+	font-size: 0.6em;
+	top: -6px;
+	background: white;
+}
+
+.input-field{
+	position: relative;
+}
+
+button{
+	background: rgba(0, 0, 0, 0.1);
+	border: 1px solid rgba(0,0,0,0.4);
+	padding: 5px;
+	text-transform: uppercase;
+}
+
+.loading{
+	filter: blur(1em);	
+}
+
+table td{
+	padding: 5px;
+}
+
+table thead{
+	font-weight: 700;
+}
+
