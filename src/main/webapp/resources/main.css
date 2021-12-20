@@ -12,6 +12,20 @@ h1, h2, h3, h4, h5{
 	text-align: center;
 }
 
+button{
+	background: rgba(0, 0, 0, 0.1);
+	border: 1px solid rgba(0,0,0,0.4);
+	padding: 5px;
+	text-transform: uppercase;
+    margin: 10px;
+}
+
+button:hover{
+    background: white;
+    cursor: pointer;
+    
+}
+
 #main-container{
 	width: 100%;
 	min-width: 600px;
@@ -31,15 +45,21 @@ h1, h2, h3, h4, h5{
 	transform: translateX(-50%);
 	top: 20%;
 	transition: display 0.3s;
+    -webkit-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
+	-moz-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
+	box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
 }
 
 #info-view-content{
 	padding: 10px;
 	border: 1px solid rgba(0, 0, 0, 0.12);
-	-webkit-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
-	-moz-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
-	box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
-	
+}
+
+#close-info-view-window-button{
+   position: relative;
+   text-align: center;
+   margin: auto;
+   display: flex;
 }
 
 table{
@@ -74,12 +94,7 @@ form{
 	position: relative;
 }
 
-button{
-	background: rgba(0, 0, 0, 0.1);
-	border: 1px solid rgba(0,0,0,0.4);
-	padding: 5px;
-	text-transform: uppercase;
-}
+
 
 .loading{
 	filter: blur(1em);	
@@ -93,3 +108,14 @@ table thead{
 	font-weight: 700;
 }
 
+tbody{
+    font-size: 0.8em;
+}
+
+td.editable-value{
+    border: 1px solid;
+}
+
+td.red-marked{
+    border: 2px solid red;
+}

@@ -1,7 +1,13 @@
 var field_active = false;
+var deviceKeys = {},
+    actionButton = {};
 
 function whenDomReady(){
-	console.log("DOM READY");
+    document.getElementById('close-info-view-window-button').addEventListener('click', function(){
+        console.log("OK");
+        showWindow(false);
+        
+    });
 	
 }
 function showDevices(){
@@ -11,7 +17,7 @@ function showDevices(){
 	req.setRequestHeader("Content-type", "Application/json");
 	req.send();
 	req.onload = function(){
-		document.getElementById("info-view-content").innerHTML = generateTable(JSON.parse(this.responseText)._embedded.suplaDevices);
+		document.getElementById("info-view-content").innerHTML = generateTable(JSON.parse(this.responseText));
 		showWindow(true);
 	};
 }
@@ -51,8 +57,7 @@ function formulaFunctions(){
 		e.preventDefault();
 		document.getElementById("info-view").classList.add("loading");
 		
-		let response = httpRequest(document.location.origin + "/suplaDevices/", formToJSON(document.getElementById("new-supla-device-form")));
-		//console.log(formToJSON(document.getElementById("new-supla-device-form")));
+		let response = httpRequest(document.location.origin + "/suplaDevices/", formToJSON(document.getElementById("new-supla-device-form")), 'POST');
 		if(response[0] == '2'){
 			alert("Success!");
 			showWindow(false);
@@ -66,19 +71,20 @@ function formulaFunctions(){
 	});
 }
 
-function httpRequest(address, data){
+function httpRequest(address, data, method){
+    
 	let responseCode;
-	httpRequest = new XMLHttpRequest();
-	httpRequest.open('POST', address);
+	let httpRequest = new XMLHttpRequest();
+	httpRequest.open(method, address);
 	httpRequest.setRequestHeader("Content-type", "application/json");
-	httpRequest.send(data);
 	httpRequest.onload = function(){
 		responseCode = this.status;
 		console.log("response text: \n" + this.responseText);
 		console.log("response code: \n" + responseCode);
+        onSuplaDeviceUpdated(this.responseText);
 	};
-	
-	return responseCode;
+    httpRequest.send(data);
+ 
 }
 
 function formToJSON(form){
@@ -96,20 +102,21 @@ function formToJSON(form){
 function generateTable(data){
 	
 	let result = '<table><thead><tr>';
-	let keys = Object.keys(data[0]);
-	keys.pop();
-	keys.forEach(function(value){
+	deviceKeys = Object.keys(data[0]);
+    
+	deviceKeys.forEach(function(value){
 		result+= '<td>'+ value + '</td>';
 	});
 	
-	result+= '</tr></thead><tbody>';
+	result+= '<td><!--space for button--></td></tr></thead><tbody>';
 	
 	data.forEach(function(singleItem){
-		result+= '<tr>';
+		result+= '<tr device-id="' + singleItem.id + '">';
 		
-		keys.forEach(function(key){
-			result+= '<td>' + singleItem[key] + '</td>';
+		deviceKeys.forEach(function(key){
+			result+= '<td class="'+ key + '">' + singleItem[key] + '</td>';
 		});
+        result+= '<td><button class="edit-device" value="edit" onclick="editDevice(' + singleItem.id + ')">Edit</button></td>';
 		result+= '</tr>';		
 		
 	});
@@ -120,3 +127,66 @@ function generateTable(data){
 	
 }
 
+function editDevice(id){
+    
+    actionButton = document.querySelector('tr[device-id="' + id + '"] button');
+    
+    if(actionButton.value == 'edit'){
+        document.querySelectorAll('tr[device-id="' + id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
+            item.contentEditable = true;
+            item.classList.add('editable-value');
+        });
+        
+        actionButton.innerHTML = "SAVE";
+        actionButton.value = 'save';
+    }
+    
+    else if(actionButton.value == 'save'){
+        let device = {};
+        deviceKeys.forEach(function(value){
+            device[value] = document.querySelector('tr[device-id="' + id + '"] .' + value).innerHTML;
+        });
+        
+        
+        if(validateDeviceFields(device))
+            httpRequest(document.location.origin + "/suplaDevices/" + id, JSON.stringify(device), 'PUT');
+    }
+}
+
+function onSuplaDeviceUpdated(data){
+    let dataParsed = JSON.parse(data);
+    
+    document.querySelectorAll('tr[device-id="' + dataParsed.id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
+        item.contentEditable = false;
+        item.classList.remove('editable-value');
+    });
+       
+    actionButton.innerHTML = "EDIT";
+    actionButton.value = 'edit';
+}
+
+function validateDeviceFields(device){
+    console.log(validateIPaddress(device.address));
+    if((device.brightness == 'true') || (device.brightness == 'false')){
+        document.querySelector('tr[device-id="' + device.id + '"] .brightness').classList.remove('red-marked');
+        
+        if(validateIPaddress(device.address)){
+            document.querySelector('tr[device-id="' + device.id + '"] .address').classList.remove('red-marked');
+            return true;
+        }
+        else{
+            document.querySelector('tr[device-id="' + device.id + '"] .address').classList.add('red-marked');
+        }
+    }
+    else{
+        document.querySelector('tr[device-id="' + device.id + '"] .brightness').classList.add('red-marked');
+    }
+    return false;
+}
+
+function validateIPaddress(ipaddress) {  
+  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {  
+    return (true);
+  }  
+  return (false)  
+} 

@@ -1,13 +1,10 @@
 package com.maniek;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.maniek.data.SuplaDevice;
+import com.maniek.data.SuplaDeviceRepo;
 import com.maniek.data.SuplaScene;
 import com.maniek.data.SuplaSceneRepo;
 import com.maniek.test.Book;
@@ -33,6 +32,9 @@ public class DataController {
 	
 	@Autowired
 	BookstoreRepo bookStoreRepo;
+	
+	@Autowired
+	SuplaDeviceRepo suplaDeviceRepo;
 	
 	@RequestMapping("/")
 	public ModelAndView home(){
@@ -83,5 +85,24 @@ public class DataController {
 		mv.setViewName("search");
 		return mv;
 	}
+	 
+	
+	  @RequestMapping("/suplaDevices")
+	  @ResponseBody
+	  public List<SuplaDevice> getSuplaDevices() {
+		  
+		  System.out.println(suplaDeviceRepo.findAll()); 
+		  return suplaDeviceRepo.findAll();
+	  
+	  }
+	  
+	  @PutMapping("/suplaDevices/{id}")
+	  @ResponseBody
+	  public SuplaDevice updateSuplaDevice(@PathVariable("id") int id, @RequestBody SuplaDevice device) {
+		  suplaDeviceRepo.save(device);
+		  
+		  return device;
+	  }
+	 
 	
 }

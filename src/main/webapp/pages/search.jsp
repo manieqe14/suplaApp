@@ -15,6 +15,7 @@
 		<div id="info-view-content">
 		 	Tu bedo jakies dane
 		</div>
+		<button id="close-info-view-window-button">Close</button>
 	</div>
 <div id="main-container">
 	<div id="second-container">
@@ -40,9 +41,10 @@
 				<input type="submit"><br>
 			</form>
 		</div>
-		
-		<button id="view-all-devices" onclick="showDevices()">View all devices</button>
-		<button id="add-new-device" onclick="addNewDevice()">Add new Supla device</button>
+		<div class="container">
+			<button id="view-all-devices" onclick="showDevices()">View all devices</button>
+			<button id="add-new-device" onclick="addNewDevice()">Add new Supla device</button>
+		</div>
 	</div>
 </div>
 <link rel="preconnect" href="https://fonts.googleapis.com">
