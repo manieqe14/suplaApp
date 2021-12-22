@@ -6,7 +6,6 @@ function whenDomReady(){
     document.getElementById('close-info-view-window-button').addEventListener('click', function(){
         console.log("OK");
         showWindow(false);
-        
     });
 	
 }
@@ -57,21 +56,22 @@ function formulaFunctions(){
 		e.preventDefault();
 		document.getElementById("info-view").classList.add("loading");
 		
-		let response = httpRequest(document.location.origin + "/suplaDevices/", formToJSON(document.getElementById("new-supla-device-form")), 'POST');
-		if(response[0] == '2'){
-			alert("Success!");
-			showWindow(false);
-		}
-		else{
-			alert("error!");
-		}
+        let callback = function formulaFunctionsReturned(data){
+            showWindow(false);
+        }
+        let data = formToJSON(document.getElementById("new-supla-device-form"));
+        //if(validateDeviceFields(data))
+            httpRequest(document.location.origin + "/suplaDevices/", data , 'POST', callback);
+        //else
+            //console.log("form error");
+        
 		
 		document.getElementById("info-view").classList.remove("loading");
 		
 	});
 }
 
-function httpRequest(address, data, method){
+function httpRequest(address, data, method, callback){
     
 	let responseCode;
 	let httpRequest = new XMLHttpRequest();
@@ -79,9 +79,10 @@ function httpRequest(address, data, method){
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.onload = function(){
 		responseCode = this.status;
-		console.log("response text: \n" + this.responseText);
-		console.log("response code: \n" + responseCode);
-        onSuplaDeviceUpdated(this.responseText);
+		//console.log("response text: \n" + this.responseText);
+		//console.log("response code: \n" + responseCode);
+        callback(this.responseText);
+        //onSuplaDeviceUpdated(this.responseText);
 	};
     httpRequest.send(data);
  
@@ -116,7 +117,7 @@ function generateTable(data){
 		deviceKeys.forEach(function(key){
 			result+= '<td class="'+ key + '">' + singleItem[key] + '</td>';
 		});
-        result+= '<td><button class="edit-device" value="edit" onclick="editDevice(' + singleItem.id + ')">Edit</button></td>';
+        result+= '<td><button class="edit-device" value="edit" onclick="editDevice(' + singleItem.id + ')">Edit</button><button class="delete-device" value="delete" onclick="deleteDevice(' + singleItem.id + ')">Delete</button></td>';
 		result+= '</tr>';		
 		
 	});
@@ -127,46 +128,57 @@ function generateTable(data){
 	
 }
 
+function deleteDevice(id){
+    
+    let callback = function(id){
+        document.querySelector('tr[device-id="' + id + '"]').remove();
+    }
+    httpRequest(document.location.origin + "/suplaDevices/" + id, "", 'DELETE', callback);
+}
+
 function editDevice(id){
     
-    actionButton = document.querySelector('tr[device-id="' + id + '"] button');
-    
-    if(actionButton.value == 'edit'){
+    editButton = document.querySelector('tr[device-id="' + id + '"] .edit-device');
+    deleteButton = document.querySelector('tr[device-id="' + id + '"] .delete-device');
+        
+    if(editButton.value == 'edit'){
         document.querySelectorAll('tr[device-id="' + id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
             item.contentEditable = true;
             item.classList.add('editable-value');
         });
         
-        actionButton.innerHTML = "SAVE";
-        actionButton.value = 'save';
+        editButton.innerHTML = "SAVE";
+        editButton.value = 'save';
+        deleteButton.style.display = "inline-block";
     }
     
-    else if(actionButton.value == 'save'){
+    else if(editButton.value == 'save'){
         let device = {};
         deviceKeys.forEach(function(value){
             device[value] = document.querySelector('tr[device-id="' + id + '"] .' + value).innerHTML;
         });
         
+        let callback = function onSuplaDeviceUpdated(data){
+            let dataParsed = JSON.parse(data);
+            
+            document.querySelectorAll('tr[device-id="' + dataParsed.id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
+                item.contentEditable = false;
+                item.classList.remove('editable-value');
+            });
+               
+            editButton.innerHTML = "EDIT";
+            editButton.value = 'edit';
+            deleteButton.style.display = "none";
+        }
+        
         
         if(validateDeviceFields(device))
-            httpRequest(document.location.origin + "/suplaDevices/" + id, JSON.stringify(device), 'PUT');
+            httpRequest(document.location.origin + "/suplaDevices/" + id, JSON.stringify(device), 'PUT', callback);
     }
 }
 
-function onSuplaDeviceUpdated(data){
-    let dataParsed = JSON.parse(data);
-    
-    document.querySelectorAll('tr[device-id="' + dataParsed.id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
-        item.contentEditable = false;
-        item.classList.remove('editable-value');
-    });
-       
-    actionButton.innerHTML = "EDIT";
-    actionButton.value = 'edit';
-}
 
 function validateDeviceFields(device){
-    console.log(validateIPaddress(device.address));
     if((device.brightness == 'true') || (device.brightness == 'false')){
         document.querySelector('tr[device-id="' + device.id + '"] .brightness').classList.remove('red-marked');
         

@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,13 +90,28 @@ public class DataController {
 	}
 	 
 	
-	  @RequestMapping("/suplaDevices")
+	  @GetMapping("/suplaDevices")
 	  @ResponseBody
 	  public List<SuplaDevice> getSuplaDevices() {
 		  
 		  System.out.println(suplaDeviceRepo.findAll()); 
 		  return suplaDeviceRepo.findAll();
+	  }
 	  
+	  @PostMapping("/suplaDevices")
+	  @ResponseBody
+	  public SuplaDevice addSuplaDevice(@RequestBody SuplaDevice suplaDevice) {
+		  
+		  suplaDeviceRepo.save(suplaDevice);
+		  return suplaDevice;
+	  }
+	  
+	  @DeleteMapping("/suplaDevices/{id}")
+	  @ResponseBody
+	  public int deleteSuplaDevice(@PathVariable("id") int id) {
+		  
+		  suplaDeviceRepo.deleteById(id);
+		  return id;
 	  }
 	  
 	  @PutMapping("/suplaDevices/{id}")
