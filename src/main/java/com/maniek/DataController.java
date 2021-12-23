@@ -3,6 +3,7 @@ package com.maniek;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import com.maniek.data.SuplaDevice;
 import com.maniek.data.SuplaDeviceRepo;
 import com.maniek.data.SuplaScene;
 import com.maniek.data.SuplaSceneRepo;
+import com.maniek.exceptions.SuplaDeviceValidationException;
 import com.maniek.test.Book;
 import com.maniek.test.BookRepo;
 import com.maniek.test.Bookstore;
@@ -102,6 +104,8 @@ public class DataController {
 	  @ResponseBody
 	  public SuplaDevice addSuplaDevice(@RequestBody SuplaDevice suplaDevice) {
 		  
+		  if(suplaDevice.isBrightness() == false)
+			  throw new SuplaDeviceValidationException(HttpStatus.NOT_ACCEPTABLE, "IP incorrect");
 		  suplaDeviceRepo.save(suplaDevice);
 		  return suplaDevice;
 	  }
@@ -121,6 +125,8 @@ public class DataController {
 		  
 		  return device;
 	  }
+	  
+	  
 	 
 	
 }

@@ -56,17 +56,20 @@ function formulaFunctions(){
 		e.preventDefault();
 		document.getElementById("info-view").classList.add("loading");
 		
-        let callback = function formulaFunctionsReturned(data){
-            showWindow(false);
+        let callback = function formulaFunctionsReturned(responseCode, data){
+            if(responseCode == 200)
+                showWindow(false);            
+            else
+                alert(data);
+            
+            document.getElementById("info-view").classList.remove("loading");
         }
+        
         let data = formToJSON(document.getElementById("new-supla-device-form"));
-        //if(validateDeviceFields(data))
-            httpRequest(document.location.origin + "/suplaDevices/", data , 'POST', callback);
-        //else
-            //console.log("form error");
+        httpRequest(document.location.origin + "/suplaDevices/", data, 'POST', callback);
         
 		
-		document.getElementById("info-view").classList.remove("loading");
+		
 		
 	});
 }
@@ -78,10 +81,9 @@ function httpRequest(address, data, method, callback){
 	httpRequest.open(method, address);
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.onload = function(){
-		responseCode = this.status;
-		//console.log("response text: \n" + this.responseText);
-		//console.log("response code: \n" + responseCode);
-        callback(this.responseText);
+		/* console.log("response text: \n" + this.responseText);
+		console.log("response code: \n" + this.status); */
+        callback(this.status, this.responseText);
         //onSuplaDeviceUpdated(this.responseText);
 	};
     httpRequest.send(data);
