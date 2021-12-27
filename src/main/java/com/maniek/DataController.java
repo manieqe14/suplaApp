@@ -21,6 +21,7 @@ import com.maniek.data.SuplaDeviceRepo;
 import com.maniek.data.SuplaScene;
 import com.maniek.data.SuplaSceneRepo;
 import com.maniek.exceptions.SuplaDeviceValidationException;
+import com.maniek.exceptions.Validations;
 import com.maniek.test.Book;
 import com.maniek.test.BookRepo;
 import com.maniek.test.Bookstore;
@@ -103,9 +104,9 @@ public class DataController {
 	  @PostMapping("/suplaDevices")
 	  @ResponseBody
 	  public SuplaDevice addSuplaDevice(@RequestBody SuplaDevice suplaDevice) {
-		  
-		  if(suplaDevice.isBrightness() == false)
-			  throw new SuplaDeviceValidationException(HttpStatus.NOT_ACCEPTABLE, "IP incorrect");
+		  if(!Validations.checkIPAddress(suplaDevice.getAddress())) {
+			  throw new SuplaDeviceValidationException(HttpStatus.BAD_REQUEST, "IP incorrect");
+		  }
 		  suplaDeviceRepo.save(suplaDevice);
 		  return suplaDevice;
 	  }

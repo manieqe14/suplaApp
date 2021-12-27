@@ -12,12 +12,16 @@ h1, h2, h3, h4, h5{
 	text-align: center;
 }
 
-button{
+button, .button{
 	background: rgba(0, 0, 0, 0.1);
 	border: 1px solid rgba(0,0,0,0.4);
 	padding: 5px;
 	text-transform: uppercase;
     margin: 10px;
+}
+
+form{
+    text-align: center;
 }
 
 button:hover{
@@ -31,6 +35,10 @@ button:hover{
     transition: display 0.2s;
 }
 
+.hidden{
+    display: none;
+}
+
 #main-container{
 	width: 100%;
 	min-width: 600px;
@@ -39,18 +47,26 @@ button:hover{
 
 #second-container{
 	margin: auto;
+    display: flex;
+}
+
+.container-with-border{
+    border: 1px solid rgba(0,0,0,0.3);
 }
 
 #info-view{
 	display: none;
 	position: fixed;
 	max-width: 80%;
+    min-width: 400px;
+    min-height: 300px;
 	background: white;
 	left: 50%;
 	transform: translateX(-50%);
 	top: 10%;
+    border: 1px solid rgba(0, 0, 0, 0.12);
     z-index: 21;
-	transition: display 0.3s;
+	transition: height 1s;
     -webkit-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
 	-moz-box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
 	box-shadow: 1px -1px 100px 100px rgba(66, 68, 90, 0.43);
@@ -58,23 +74,93 @@ button:hover{
 
 #info-view-content{
 	padding: 10px;
-	border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 #close-info-view-window-button{
-   position: relative;
-   text-align: center;
-   margin: auto;
-   display: flex;
+   position: absolute;
+   right: 10px;
+   bottom: 10px;
 }
+li{
+    list-style-type: none;
+    margin: 5px;
+    padding: 5px;
+    position: relative
+}
+
+li:hover{
+    cursor: pointer;
+    background: white;
+}
+
+.active{
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+.active:after{
+    position: absolute;
+    top: 0;
+    right: -1px;
+    background: white;
+    width: 1px;
+    height: 40px;
+    content: ""; 
+}
+
+#scenes-tab{
+    display: none;
+}
+
+.tab{
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    min-height: 140px;
+}
+
+.tabs{
+    flex-grow: 3;
+    margin-left: -6px;
+    
+}
+
+ul.device-list-for-scene{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 5px;
+}
+
+ul.device-list-for-scene li{
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+     -webkit-box-shadow: inset 0px 0px 8px 0px rgb(66 68 90 / 43%);
+	-moz-box-shadow: inset 0px 0px 8px 0px rgb(66 68 90 / 43%);
+	box-shadow: inset 0px 0px 8px 0px rgb(66 68 90 / 43%);
+        
+}
+
+ul.device-list-for-scene li::before{
+    content: "+";
+    font-weight: 900;
+    margin-right: 5px;
+}
+
+ul.device-list-for-scene li:hover{
+    background:white;
+}
+
+#chosen-devices{
+    min-height: 300px;
+}
+
 
 table{
 	margin: auto;
+        margin-bottom: 40px;
 }
 
 .container{
 	text-align:center;
-	margin: auto;
+	margin: 10px auto;
 }
 
 form{
@@ -89,22 +175,17 @@ form{
 	transition: all 0.3s;
 }
 
-.input-field input[type="text"]:focus ~ label{
+/* .input-field input[type="text"]:focus ~ label{
 	left: 0px;
 	font-size: 0.6em;
 	top: -6px;
 	background: white;
-}
+} */
 
 .input-field{
 	position: relative;
 }
 
-
-
-.loading{
-	filter: blur(1em);	
-}
 
 table td{
 	padding: 5px;
@@ -124,4 +205,39 @@ td.editable-value{
 
 td.red-marked{
     border: 2px solid red;
+}
+
+/* loading animation */
+.loader{
+    position: absolute;
+    background: white;
+    width: 100%;
+    height: 100%;
+}
+.loader > div{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+}
+
+.loader div div{
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite; 
+}
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg);
+    
+  }
+  100% { 
+    transform: rotate(360deg);
+  }
+}
 }

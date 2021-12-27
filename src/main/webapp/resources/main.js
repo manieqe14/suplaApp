@@ -1,23 +1,54 @@
 var field_active = false;
 var deviceKeys = {},
-    actionButton = {};
+    actionButton = {},
+    loader = null,
+    homeUrl = document.location.origin,
+    infoWindow = null,
+    devices = null;
 
 function whenDomReady(){
     document.getElementById('close-info-view-window-button').addEventListener('click', function(){
         console.log("OK");
         showWindow(false);
     });
-	
+    
+    loader = document.querySelector("#info-view .loader");
+    infoWindow = document.getElementById("info-view-content");
+    var tabItems =  document.querySelectorAll('li.tab-item');
+    
+    tabItems.forEach(function(item){
+        item.addEventListener('click', function(){
+            tabItems.forEach(function (tabItem){
+                
+                if(tabItem == item) tabItem.classList.add("active");
+                else tabItem.classList.remove("active");
+            });
+            
+            document.querySelectorAll('.tab').forEach(function(tab){
+                if(tab.id == item.getAttribute("tab")) {
+                    tab.style.display = "block";
+                }
+                else {
+                    tab.style.display = "none";
+                }
+            });
+        });
+        
+    });
+    
 }
 function showDevices(){
-	
+    document.getElementById("info-view-content").innerHTML = '';
 	let req = new XMLHttpRequest();
+    showLoader(true, 0);
+    showWindow(true);
 	req.open('GET', document.location.origin + "/suplaDevices");
 	req.setRequestHeader("Content-type", "Application/json");
 	req.send();
 	req.onload = function(){
-		document.getElementById("info-view-content").innerHTML = generateTable(JSON.parse(this.responseText));
-		showWindow(true);
+		infoWindow.innerHTML = generateTable(JSON.parse(this.responseText));
+        showLoader(false);
+		
 	};
 }
 
@@ -29,7 +60,8 @@ function addNewDevice(){
 		+ '<span class="radio-group-field"><input type="radio" name="brightness" value="false"><label for="true">False</label></span></p>'  
 		+ '<button id="create-new-supla-device" value="Create">Create</button></form>';
 	
-	document.getElementById("info-view-content").innerHTML = newDeviceFormula;
+	infoWindow.innerHTML = newDeviceFormula;
+    showLoader(false, 0);
 	showWindow(true);
 	formulaFunctions();
 
@@ -48,13 +80,28 @@ function showWindow(value){
 	}
 }
 
+function showLoader(value, delay){
+        if(delay === undefined) delay = 300;
+        if(value == true){
+            loader.querySelector("div").style.opacity = '1';
+            setTimeout(function(){
+                loader.style.display = "block";
+            }, delay);
+        }
+        else{
+            loader.querySelector("div").style.opacity = '0';
+            setTimeout(function(){
+                loader.style.display = "none";
+            }, delay);
+        }
+    }
+
 
 //function after window appeared
 function formulaFunctions(){
 
 	document.getElementById("create-new-supla-device").addEventListener('click', function(e){
 		e.preventDefault();
-		document.getElementById("info-view").classList.add("loading");
 		
         let callback = function formulaFunctionsReturned(responseCode, data){
             if(responseCode == 200)
@@ -62,29 +109,23 @@ function formulaFunctions(){
             else
                 alert(data);
             
-            document.getElementById("info-view").classList.remove("loading");
+            showLoader(false);
+            
         }
         
         let data = formToJSON(document.getElementById("new-supla-device-form"));
         httpRequest(document.location.origin + "/suplaDevices/", data, 'POST', callback);
         
-		
-		
-		
 	});
 }
 
 function httpRequest(address, data, method, callback){
-    
 	let responseCode;
 	let httpRequest = new XMLHttpRequest();
 	httpRequest.open(method, address);
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.onload = function(){
-		/* console.log("response text: \n" + this.responseText);
-		console.log("response code: \n" + this.status); */
-        callback(this.status, this.responseText);
-        //onSuplaDeviceUpdated(this.responseText);
+        callback(this.status, JSON.parse(this.responseText));
 	};
     httpRequest.send(data);
  
@@ -132,7 +173,7 @@ function generateTable(data){
 
 function deleteDevice(id){
     
-    let callback = function(id){
+    let callback = function(responseCode, id){
         document.querySelector('tr[device-id="' + id + '"]').remove();
     }
     httpRequest(document.location.origin + "/suplaDevices/" + id, "", 'DELETE', callback);
@@ -160,10 +201,8 @@ function editDevice(id){
             device[value] = document.querySelector('tr[device-id="' + id + '"] .' + value).innerHTML;
         });
         
-        let callback = function onSuplaDeviceUpdated(data){
-            let dataParsed = JSON.parse(data);
-            
-            document.querySelectorAll('tr[device-id="' + dataParsed.id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
+        let callback = function onSuplaDeviceUpdated(responseCode, responseData){
+            document.querySelectorAll('tr[device-id="' + responseData.id +'"] td:not(:last-child):not(:first-child').forEach(function(item) {
                 item.contentEditable = false;
                 item.classList.remove('editable-value');
             });
@@ -204,3 +243,44 @@ function validateIPaddress(ipaddress) {
   }  
   return (false)  
 } 
+
+//suplaScenes
+
+function addNewScene(){
+    
+    let callback = function(responseCode, responseBody){
+        // console.log("code: " + responseCode);
+        // console.log("\nbody: " + responseBody);
+        devices = responseBody;
+        let text = '<h3>Chosen devices:</h3><div class="container container-with-border"><ul id="chosen-devices"></ul></div><div class="container container-with-border"><ul class="device-list-for-scene">';
+        responseBody.forEach(function(device){
+            text+='<li device-id="' + device.id + '">' + device.name + '</li>';
+        });
+        text+='</ul></div>';
+        infoWindow.innerHTML = text;
+        showLoader(false);
+        showWindow(true);
+        
+        document.querySelectorAll('ul.device-list-for-scene li').forEach(function(device){
+            device.addEventListener('click', function(){
+                let a = (findDeviceById(this.getAttribute('device-id')));
+                document.getElementById('chosen-devices').innerHTML += '<li device-id="' + a.id + '">' + a.name + '</li>';
+                this.remove();
+            });
+            
+        });
+        
+    };
+    
+    httpRequest(homeUrl + '/suplaDevices', null, 'GET', callback);
+}
+
+function findDeviceById(id){
+    let result = "";
+    devices.forEach(function(item){
+        if(item.id == id) {
+            result = item;
+        }
+    });
+    return result;
+}
