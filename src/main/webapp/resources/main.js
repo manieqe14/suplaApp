@@ -249,8 +249,6 @@ function validateIPaddress(ipaddress) {
 function addNewScene(){
     
     let callback = function(responseCode, responseBody){
-        // console.log("code: " + responseCode);
-        // console.log("\nbody: " + responseBody);
         devices = responseBody;
         let text = '<h3>Chosen devices:</h3><div class="container container-with-border"><ul id="chosen-devices"></ul></div><div class="container container-with-border"><ul class="device-list-for-scene">';
         responseBody.forEach(function(device){
@@ -264,7 +262,17 @@ function addNewScene(){
         document.querySelectorAll('ul.device-list-for-scene li').forEach(function(device){
             device.addEventListener('click', function(){
                 let a = (findDeviceById(this.getAttribute('device-id')));
-                document.getElementById('chosen-devices').innerHTML += '<li device-id="' + a.id + '">' + a.name + '</li>';
+                let chosenDevicesHTML = document.getElementById('chosen-devices');
+                
+                let resultText = '<li device-id="' + a.id + '"><p>' + a.name + '</p><p><label for="state">Status:</label><select id="state"><option value="true">ON</option><option value="false">OFF</option></select>';
+                
+                if(a.brightness == true){
+                    chosenDevicesHTML.innerHTML += resultText + '<input type="range" value="24" min="1" max="100" oninput="this.nextElementSibling.value = this.value"><output>24</output></p></li>';
+                }
+                else{
+                    chosenDevicesHTML.innerHTML += resultText + '</p></li>';
+                }
+                
                 this.remove();
             });
             

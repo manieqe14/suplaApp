@@ -21,7 +21,7 @@ public class SuplaScene {
 	private String name;
 	
 	@OneToMany
-	private List<SuplaDevice> suplaDevicesList;
+	private List<SuplaDeviceValue> suplaDeviceValues;
 
 	public int getId() {
 		return id;
@@ -38,19 +38,22 @@ public class SuplaScene {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public List<SuplaDevice> getSuplaDevicesList() {
-		return suplaDevicesList;
+	
+	
+	
+	public List<SuplaDeviceValue> getSuplaDeviceValues() {
+		return suplaDeviceValues;
 	}
 
-	public void setSuplaDevicesList(List<SuplaDevice> suplaDevicesList) {
-		this.suplaDevicesList = suplaDevicesList;
+	public void setSuplaDevicesValues(List<SuplaDeviceValue> suplaDeviceValues) {
+		this.suplaDeviceValues = suplaDeviceValues;
 	}
 
 	@Override
 	public String toString() {
-		return "SuplaScene [id=" + id + ", name=" + name + ", suplaDevicesList=" + suplaDevicesList + "]";
+		return "SuplaScene [id=" + id + ", name=" + name + ", suplaDevicesValues=" + suplaDeviceValues + "]";
 	}
+	
 	
 	
 
